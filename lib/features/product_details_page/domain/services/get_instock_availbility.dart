@@ -1,0 +1,1 @@
+// check if the choosen things on the screen are an availble varition or not

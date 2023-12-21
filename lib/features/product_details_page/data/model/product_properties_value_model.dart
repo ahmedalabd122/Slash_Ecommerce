@@ -1,4 +1,3 @@
-
 class ProductPropertiesValue {
   String? value;
   String? property;
@@ -18,4 +17,6 @@ class ProductPropertiesValue {
         "value": value,
         "property": property,
       };
+
+  
 }
