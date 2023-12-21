@@ -216,15 +216,18 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               items: List.generate(
                                 _services.getAvailableSizesSet().length,
                                 (innerIndex) {
-                                  return Text(_services
-                                      .getAvailableSizesSet()
-                                      .elementAt(innerIndex));
+                                  return Text(
+                                    _services
+                                        .getAvailableSizesSet()
+                                        .elementAt(innerIndex),
+                                    style: AppTextTheme.black14Bold,
+                                  );
                                 },
                               ),
                               backgroundColor: AppColorTheme.backGround,
                               indicatorColor:
                                   const Color.fromARGB(255, 193, 235, 86),
-                              itemExtent: 40,
+                              itemExtent: 80,
                               height: 40,
                               radius: 20,
                               onChanged: (innerIndex) {
@@ -267,21 +270,24 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               items: List.generate(
                                 _services.getAvailableMaterialsSet().length,
                                 (innerIndex) {
-                                  return Text(_services
-                                      .getAvailableMaterialsSet()
-                                      .elementAt(innerIndex));
+                                  return Text(
+                                    _services
+                                        .getAvailableMaterialsSet()
+                                        .elementAt(innerIndex),
+                                    style: AppTextTheme.black14Bold,
+                                  );
                                 },
                               ),
                               backgroundColor: AppColorTheme.backGround,
                               indicatorColor:
                                   const Color.fromARGB(255, 193, 235, 86),
-                              itemExtent: 40,
+                              itemExtent: 80,
                               height: 40,
                               radius: 20,
                               onChanged: (innerIndex) {
                                 setState(() {
                                   selectedSize = innerIndex;
-                                  selectedProp['Material'] = _services
+                                  selectedProp['Materials'] = _services
                                       .getAvailableMaterialsSet()
                                       .elementAt(innerIndex);
                                   int id = _services.checkInStock(selectedProp);
@@ -382,8 +388,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   ),
                   TextButton(
                     onPressed: () {},
-                    child: const Text(
-                      'Add to cart',
+                    child: Text(
+                      _services.checkInStock(selectedProp) != -1
+                          ? 'Add to cart'
+                          : 'Out of Stock',
                       style: AppTextTheme.black17Bold,
                     ),
                   ),

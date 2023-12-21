@@ -48,7 +48,7 @@ class Services {
 
     int propIndex = -1;
     for (int i = 0; i < availablePropertiesList().length; i++) {
-      if (availablePropertiesList()[i] == 'Material') {
+      if (availablePropertiesList()[i] == 'Materials') {
         propIndex = i;
         break;
       }
