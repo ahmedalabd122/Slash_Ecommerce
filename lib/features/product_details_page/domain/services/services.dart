@@ -1,10 +1,13 @@
 // contains all functions that I will use during the app
 
+import 'dart:developer';
+
+import 'package:flutter/foundation.dart';
+
 import 'package:slash_internship_assignment/features/product_details_page/data/model/get_product_variations.dart';
 import 'package:slash_internship_assignment/features/product_details_page/data/model/product_varition_images_model.dart';
 import 'package:slash_internship_assignment/features/product_details_page/data/model/variation_data_model.dart';
 import 'package:slash_internship_assignment/features/product_details_page/data/model/variation_model.dart';
-import 'package:flutter/foundation.dart';
 
 class Services {
   GetProductVariations productVariations;
@@ -16,6 +19,19 @@ class Services {
 
   int getDefaultId() {
     return getProductVariationsData().variations![0].id!;
+  }
+
+  Map<String, String> getDefaultSelectedProperties() {
+    Map<String, String> getDefaultSelectedProperties1 = {};
+    for (int i = 0; i < getVariationsNum(); i++) {
+      for (int j = 0; j < availablePropertiesList().length; j++) {
+        getDefaultSelectedProperties1['property'] = productVariations
+            .data!.variations![i].productPropertiesValues![j].property!;
+        getDefaultSelectedProperties1['value'] = productVariations
+            .data!.variations![i].productPropertiesValues![j].value!;
+      }
+    }
+    return getDefaultSelectedProperties1;
   }
 
   int getVariationsNum() {
@@ -137,7 +153,7 @@ class Services {
         return getProductVariationsData().variations![i];
       }
     }
-    return Variation();
+    return getProductVariationsData().variations![0];
   }
 
   int getPriceByVId(int id) {
@@ -147,21 +163,22 @@ class Services {
   List<ProductVarientImage> getImagesByVId(int id) {
     return getVariationById(id).productVarientImages!;
   }
+// {id:{color:red,size:l,material:cotton}}
 
-  List<Map<int, dynamic>> getVariaionsPropertyMapList() {
-    List<Map<int, dynamic>> getVariaionsPropertyMapList1 = [];
+  Map<int, dynamic> getVariaionsPropertyMapList() {
+    Map<int, dynamic> getVariaionsPropertyMapList1 = {};
+    int id = -1;
     for (int i = 0; i < getVariationsNum(); i++) {
+      Map<String, String> m = {};
       for (int j = 0; j < availablePropertiesList().length; j++) {
-        Map<String, String> m = {
-          'property': productVariations
-              .data!.variations![i].productPropertiesValues![j].property!,
-          'value': productVariations
-              .data!.variations![i].productPropertiesValues![j].value!,
-        };
-        int id = productVariations.data!.variations![i].id!;
-        Map<int, Map> f = {id: m};
-        getVariaionsPropertyMapList1 = getVariaionsPropertyMapList1 + [f];
+        m[productVariations
+                .data!.variations![i].productPropertiesValues![j].property!] =
+            productVariations
+                .data!.variations![i].productPropertiesValues![j].value!;
+        id = productVariations.data!.variations![i].id!;
       }
+
+      getVariaionsPropertyMapList1[id] = m;
     }
     return getVariaionsPropertyMapList1;
   }
@@ -183,16 +200,24 @@ class Services {
 
   int checkInStock(Map<String, String> selectedProperty) {
     // color + size + material
+    debugPrint('1  ${selectedProperty.toString()}');
 
-    for (int i = 0; i < getVariaionsPropertyMapList().length; i++) {
-      for (var value in getVariaionsPropertyMapList()[i].values) {
-        if (mapEquals(value, selectedProperty)) {
-          int key = getVariaionsPropertyMapList()[i].keys.firstWhere(
-              (k) => mapEquals(getVariaionsPropertyMapList()[i][k], value),
-              orElse: () => -1);
-          return key;
-        }
+    for (var value in getVariaionsPropertyMapList().values) {
+      debugPrint('2  ${value.toString()}');
+      if (mapEquals(value, selectedProperty)) {
+        debugPrint('3  ${selectedProperty.toString()}');
+
+        int key = getVariaionsPropertyMapList().keys.firstWhere((k) {
+          debugPrint('4  ${selectedProperty.toString()}');
+          debugPrint(
+              '5  ${mapEquals(getVariaionsPropertyMapList()[k], value).toString()}');
+
+          return mapEquals(getVariaionsPropertyMapList()[k], value);
+        });
+        log(key.toString());
+        return key;
       }
+      // var key = map.keys.firstWhere((k) => map[k] == 'Bag', orElse: () => null);
     }
     return -1;
   }

@@ -37,19 +37,23 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
     setState(() {
       _services = Services(productVariations: productVariations);
-      loadings = false;
       imageCount = _services.getInitialImageCount();
       variationId = _services.getDefaultId();
+      if (_services.availablePropertiesList().isNotEmpty) {
+        for (int i = 0; i < _services.availablePropertiesList().length; i++) {
+          selectedProp[
+                  '${_services.getProductVariationsData().variations![0].productPropertiesValues![i].property}'] =
+              '${_services.getProductVariationsData().variations![0].productPropertiesValues![i].value}';
+        }
+      }
 
-      debugPrint('${_services.checkInStock({
-            'property': 'Color',
-            'value': '999FA0'
-          })}');
+      loadings = false;
     });
     return productVariations;
   }
 
   int imageIndex = 0;
+
   int selectedColor = 0;
   int selectedSize = 0;
   int selectedMaterial = 0;
@@ -181,16 +185,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                       .getAvailableColorsSet()
                                       .elementAt(innerIndex);
                                   int id = _services.checkInStock(selectedProp);
-                                  if (id == -1) {
-                                    variationId = _services
-                                        .productVariations
-                                        .data!
-                                        .avaiableProperties![0]
-                                        .values![innerIndex]
-                                        .id!;
-                                  } else {
-                                    imageCount =
-                                        _services.getInitialImageCount();
+                                  //debugPrint('$id');
+                                  if (id != -1) {
+                                    inStock = true;
+
+                                    variationId = id;
                                   }
                                 });
                               },
@@ -232,19 +231,19 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               radius: 20,
                               onChanged: (innerIndex) {
                                 setState(() {
-                                  selectedSize = innerIndex;
                                   selectedProp['Size'] = _services
                                       .getAvailableSizesSet()
                                       .elementAt(innerIndex);
                                   int id = _services.checkInStock(selectedProp);
                                   if (id != -1) {
-                                    imageCount = _services
-                                        .getVariationById(id)
-                                        .productVarientImages!
-                                        .length;
-                                  } else {
-                                    imageCount =
-                                        _services.getInitialImageCount();
+                                    inStock = true;
+                                    selectedSize = innerIndex;
+
+                                    variationId = id;
+                                    // imageCount = _services
+                                    //     .getVariationById(id)
+                                    //     .productVarientImages!
+                                    //     .length;
                                   }
                                 });
                               },
@@ -286,19 +285,20 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               radius: 20,
                               onChanged: (innerIndex) {
                                 setState(() {
-                                  selectedSize = innerIndex;
                                   selectedProp['Materials'] = _services
                                       .getAvailableMaterialsSet()
                                       .elementAt(innerIndex);
                                   int id = _services.checkInStock(selectedProp);
                                   if (id != -1) {
-                                    imageCount = _services
-                                        .getVariationById(id)
-                                        .productVarientImages!
-                                        .length;
-                                  } else {
-                                    imageCount =
-                                        _services.getInitialImageCount();
+                                    inStock = true;
+
+                                    variationId = id;
+                                    selectedMaterial = innerIndex;
+
+                                    // imageCount = _services
+                                    //     .getVariationById(id)
+                                    //     .productVarientImages!
+                                    //     .length;
                                   }
                                 });
                               },
@@ -308,77 +308,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       : const SizedBox(
                           height: 10,
                         ),
-
-                  // SizedBox(
-                  //   height: _services.getAvailableColorsSet().isNotEmpty
-                  //       ? ((_services.availablePropertiesList().length - 1) *
-                  //           110)
-                  //       : ((_services.availablePropertiesList().length) * 110),
-                  //   child: ListView.builder(
-                  //     physics: const NeverScrollableScrollPhysics(),
-                  //     itemCount: _services.availablePropertiesList().length - 1,
-                  //     itemBuilder: (context, index) {
-                  //       return Column(
-                  //         children: [
-                  //           const SizedBox(
-                  //             height: 10,
-                  //           ),
-                  //           Text(
-                  //               _services.availablePropertiesList()[index + 1]),
-                  //           const SizedBox(
-                  //             height: 10,
-                  //           ),
-                  //           SimpleSelector(
-                  //             selectedIndex: selectedColor,
-                  //             dense: false,
-                  //             items: List.generate(
-                  //                 productVariations
-                  //                     .data!
-                  //                     .avaiableProperties![index]
-                  //                     .values!
-                  //                     .length, (innerIndex) {
-                  //               if (productVariations.data!
-                  //                       .avaiableProperties?[index].property ==
-                  //                   'Color') {
-                  //                 String color =
-                  //                     '0xff${productVariations.data!.avaiableProperties?[index].values![innerIndex].value}';
-                  //                 String newColor = color.replaceAll('#', '0');
-                  //                 return Container(
-                  //                   decoration: BoxDecoration(
-                  //                     borderRadius: BorderRadius.circular(10),
-                  //                     color: Color(
-                  //                       int.parse(newColor),
-                  //                     ),
-                  //                   ),
-                  //                 );
-                  //               }
-
-                  //               return Text(
-                  //                   '${productVariations.data!.avaiableProperties?[index].values![innerIndex].value}');
-                  //             }),
-                  //             indicatorColor: selectedColor == 0
-                  //                 ? const Color(0xff2980b9)
-                  //                 : const Color(0xff2980b9).withOpacity(0.5),
-                  //             itemExtent: 60,
-                  //             height: 60,
-                  //             onChanged: (innerIndex) {
-                  //               debugPrint(
-                  //                   '${productVariations.data!.avaiableProperties?[index].values![innerIndex].id}');
-                  //               setState(() {
-                  //                 selectedColor = innerIndex;
-                  //                 imageCount = productVariations
-                  //                     .data!
-                  //                     .variations![innerIndex]
-                  //                     .productVarientImages!
-                  //                     .length;
-                  //               });
-                  //             },
-                  //           ),
-                  //         ],
-                  //       );
-                  //     },
-                  //   ),
-                  // ),
                   ExpansionTile(
                     title: const Text('Description'),
                     children: [Text('${productVariations.data!.description}')],
@@ -389,9 +318,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                   TextButton(
                     onPressed: () {},
                     child: Text(
-                      _services.checkInStock(selectedProp) != -1
-                          ? 'Add to cart'
-                          : 'Out of Stock',
+                      inStock ? 'Add to cart' : 'Out of Stock',
                       style: AppTextTheme.black17Bold,
                     ),
                   ),
