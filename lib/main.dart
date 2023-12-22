@@ -15,7 +15,7 @@ class SlashECommerceApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ProductsPage(),
+      home: const ProductsPage(),
       theme: ThemeData(
         iconTheme: const IconThemeData(
           color: AppColorTheme.primaryColor,

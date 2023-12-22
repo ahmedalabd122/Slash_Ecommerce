@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:slash_internship_assignment/features/product_details_page/data/data_source/data_sources.dart';
 import 'package:slash_internship_assignment/features/product_details_page/data/model/get_product_variations.dart';
@@ -52,12 +50,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return productVariations;
   }
 
-  int imageIndex = 0;
+  int? imageIndex = 0;
 
   int selectedColor = 0;
   int selectedSize = 0;
   int selectedMaterial = 0;
-
+  int selectedImage = 0;
+  SwiperController swiperController = SwiperController();
   Map<String, String> selectedProp = {};
   int variationId = 0;
   int imageCount = 0;
@@ -88,10 +87,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           : SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(.0),
                     child: Swiper(
+                      onIndexChanged: (index) {
+                        setState(() {
+                          imageIndex = index;
+                        });
+                      },
+                      controller: swiperController,
                       indicatorLayout: PageIndicatorLayout.WARM,
                       layout: SwiperLayout.CUSTOM,
                       itemCount: imageCount,
@@ -106,12 +112,67 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       itemWidth: MediaQuery.sizeOf(context).width / 1.5,
                       itemHeight: 300.0,
                       itemBuilder: (context, index) {
-                        return RecImage(
-                            imageUrl: _services
-                                .getImagesByVId(variationId)[index]
-                                .imagePath!);
+                        return Container(
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset: const Offset(-5, 5),
+                              )
+                            ],
+                          ),
+                          child: RecImage(
+                              imageUrl: _services
+                                  .getImagesByVId(variationId)[index]
+                                  .imagePath!),
+                        );
                       },
                     ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  SimpleSelector(
+                    selectedIndex: imageIndex!,
+                    dense: false,
+                    items: List.generate(
+                      imageCount,
+                      (innerIndex) {
+                        return Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.5),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset: const Offset(-5, 5),
+                              )
+                            ],
+                            borderRadius: BorderRadius.circular(6),
+                            image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: NetworkImage(_services
+                                    .getImagesByVId(variationId)[innerIndex]
+                                    .imagePath!)),
+                          ),
+                        );
+                      },
+                    ),
+                    backgroundColor: AppColorTheme.backGround,
+                    indicatorColor: const Color.fromARGB(255, 193, 235, 86),
+                    itemExtent: 55,
+                    height: 55,
+                    radius: 10,
+                    onChanged: (innerIndex) {
+                      setState(() {
+                        imageIndex = innerIndex;
+                        swiperController.move(imageIndex!);
+                      });
+                    },
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -185,7 +246,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                       .getAvailableColorsSet()
                                       .elementAt(innerIndex);
                                   int id = _services.checkInStock(selectedProp);
-                                  //debugPrint('$id');
                                   if (id != -1) {
                                     inStock = true;
 
@@ -240,10 +300,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                     selectedSize = innerIndex;
 
                                     variationId = id;
-                                    // imageCount = _services
-                                    //     .getVariationById(id)
-                                    //     .productVarientImages!
-                                    //     .length;
                                   }
                                 });
                               },
@@ -294,11 +350,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
                                     variationId = id;
                                     selectedMaterial = innerIndex;
-
-                                    // imageCount = _services
-                                    //     .getVariationById(id)
-                                    //     .productVarientImages!
-                                    //     .length;
                                   }
                                 });
                               },
@@ -308,9 +359,28 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       : const SizedBox(
                           height: 10,
                         ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   ExpansionTile(
                     title: const Text('Description'),
-                    children: [Text('${productVariations.data!.description}')],
+                    backgroundColor: Colors.grey[900],
+                    collapsedShape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        10,
+                      ),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        10,
+                      ),
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Text('${productVariations.data!.description}'),
+                      ),
+                    ],
                   ),
                   const SizedBox(
                     height: 30,
